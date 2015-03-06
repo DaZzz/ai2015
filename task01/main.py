@@ -55,7 +55,6 @@ class MainWindow(QMainWindow):
   def createImageGroup(self, title, imageLabel, caption):
     aGroup = QGroupBox(title)
 
-
     imageLabel.setBackgroundRole(QPalette.Dark)
     imageLabel.setStyleSheet('QLabel { background-color: #afafaf; border-radius: 8px; }')
     imageLabel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -80,22 +79,23 @@ class MainWindow(QMainWindow):
   ###
   # Actions
   ###
-  def openImageA(self):
+  def openImage(self, imageType):
     filePath, _ = QFileDialog.getOpenFileName(self, 'Open Image', '', 'Image Files (*.png *.jpeg *.jpg)')
-    self.imageA = QImage(filePath)
-    self.imageLabelA.setPixmap(QPixmap.fromImage(self.imageA))
 
-  def openImageB(self):
-    pass
+    image, imageLabel = {
+      ImageType.A: (self.imageA, self.imageLabelA),
+      ImageType.B: (self.imageB, self.imageLabelB),
+      ImageType.C: (self.imageC, self.imageLabelC)
+      }[imageType]
 
-  def openImageC(self):
-    pass
-
+    image = QImage(filePath)
+    imageLabel.setPixmap(QPixmap.fromImage(image))
 
   def createActions(self):
-    self.openImageAAct = QAction('&Open image A', self, triggered=self.openImageA)
-    self.openImageBAct = QAction('&Open image B', self, triggered=self.openImageB)
-    self.openImageCAct = QAction('&Open for classification', self, shortcut=QKeySequence.Open, triggered=self.openImageC)
+    self.openImageAAct = QAction('&Open image A', self, triggered=lambda: self.openImage(ImageType.A))
+    self.openImageBAct = QAction('&Open image B', self, triggered=lambda: self.openImage(ImageType.B))
+    self.openImageCAct = QAction('&Open for classification', self, shortcut=QKeySequence.Open, \
+                                triggered=lambda: self.openImage(ImageType.C))
 
   ###
   # Menus
