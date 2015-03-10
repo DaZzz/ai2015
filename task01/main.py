@@ -7,6 +7,9 @@ import numpy as np
 import math
 from ImageType import ImageType
 
+
+IMAGE_LABEL_SIZE = 200
+
 class MainWindow(QMainWindow):
   ###
   # Init window:
@@ -58,8 +61,8 @@ class MainWindow(QMainWindow):
     imageLabel.setBackgroundRole(QPalette.Dark)
     imageLabel.setStyleSheet('QLabel { background-color: #afafaf; border-radius: 8px; }')
     imageLabel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-    imageLabel.setMaximumSize(200, 200)
-    imageLabel.setMinimumSize(200, 200)
+    imageLabel.setMaximumSize(IMAGE_LABEL_SIZE, IMAGE_LABEL_SIZE)
+    imageLabel.setMinimumSize(IMAGE_LABEL_SIZE, IMAGE_LABEL_SIZE)
     centeringWidget = QWidget()
     centeringLayout = QGridLayout()
     centeringLayout.addWidget(imageLabel)
@@ -89,7 +92,9 @@ class MainWindow(QMainWindow):
       }[imageType]
 
     image = QImage(filePath)
-    imageLabel.setPixmap(QPixmap.fromImage(image))
+    pixmap = QPixmap.fromImage(image).scaled(IMAGE_LABEL_SIZE, IMAGE_LABEL_SIZE, \
+             Qt.IgnoreAspectRatio, Qt.FastTransformation)
+    imageLabel.setPixmap(pixmap)
 
   def createActions(self):
     self.openImageAAct = QAction('&Open image A', self, triggered=lambda: self.openImage(ImageType.A))
