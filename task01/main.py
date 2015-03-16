@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 import numpy as np
 import math
 from ImageType import ImageType
-
+from Classifier import Classifier
 
 IMAGE_LABEL_SIZE = 200
 
@@ -92,6 +92,7 @@ class MainWindow(QMainWindow):
       }[imageType]
 
     image = QImage(filePath)
+
     pixmap = QPixmap.fromImage(image).scaled(IMAGE_LABEL_SIZE, IMAGE_LABEL_SIZE, \
              Qt.IgnoreAspectRatio, Qt.FastTransformation)
     imageLabel.setPixmap(pixmap)
