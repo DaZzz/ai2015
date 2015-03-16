@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
     self.imageA = None
     self.imageB = None
     self.imageC = None
+    self.classifier = Classifier()
 
     self.imageLabelA = QLabel()
     self.imageLabelB = QLabel()
@@ -92,6 +93,7 @@ class MainWindow(QMainWindow):
       }[imageType]
 
     image = QImage(filePath)
+    self.classifier.setImage(imageType, image)
 
     pixmap = QPixmap.fromImage(image).scaled(IMAGE_LABEL_SIZE, IMAGE_LABEL_SIZE, \
              Qt.IgnoreAspectRatio, Qt.FastTransformation)

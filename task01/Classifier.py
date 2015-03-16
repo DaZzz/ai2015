@@ -1,19 +1,32 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from ImageType import ImageType
 
 class Classifier(object):
 
-  def __init__(self, img1, img2):
+  def __init__(self):
     super(Classifier, self).__init__()
-    self.setA = Classifier._imageToVectorSet(img1)
-    self.setB = Classifier._imageToVectorSet(img2)
+    self.setA = None
+    self.setB = None
+
+  ###
+  # Set image A or B
+  ###
+  def setImage(self, imageType, image):
+    if not (imageType in [ImageType.A, ImageType.B]): return
+
+    imageSet = {
+      ImageType.A: self.setA,
+      ImageType.B: self.setB
+    }[imageType]
+
+    imageSet = self._imageToVectorSet(image)
 
   ###
   # Get vector of all image shifts
   ###
-  @classmethod
-  def _imageToVectorSet(cls, image):
+  def _imageToVectorSet(self, image):
     resultSet = []
     w, h = image.width(), image.height()
     originalVector = [1.0]*(w*h)
@@ -42,14 +55,4 @@ class Classifier(object):
           v[j] = originalVector[shiftJ]
       resultSet.append(v)
 
-
-
-
-
-
-
-
-
-
-
-
+    return resultSet
