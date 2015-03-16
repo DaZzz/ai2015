@@ -62,7 +62,7 @@ class Classifier(object):
   ###
   # Check if linearly separable
   ###
-  def isLinearlySeparable(self):
+  def linearSeparation(self):
     if (not self.setA) or (not self.setB): return None
 
     setC = []
@@ -90,7 +90,7 @@ class Classifier(object):
     l = [li / len(setC) for li in l]
 
     # Main algorithm
-    for k in range(10000):
+    for k in range(1000):
       minC = setC[0]
       minVal = sum(x*y for x, y in zip(l, minC))
 
@@ -108,5 +108,19 @@ class Classifier(object):
     return None
 
   ###
-  # Scalar
+  # Get image class
   ###
+  def getImageClass(self, image):
+    l = self.linearSeparation()
+    if not l: return None
+
+    w, h = image.width(), image.height()
+    vector = [1.0]*(w*h)
+
+    for y in range(h):
+      for x in range(w):
+        vector[x+y*w] = 1.0 if qRed(image.pixel(x, y)) < 125 else 0.0
+
+    s = sum(x*y for x, y in zip(l[:-1], vector))
+    return ImageType.A if s > l[-1] else ImageType.B
+

@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
     self.imageLabelA = QLabel()
     self.imageLabelB = QLabel()
     self.imageLabelC = QLabel()
+    self.imageCaptionC = QLabel()
 
     # Basic window setup
     self.setWindowTitle('Classifier MX2020')
@@ -53,14 +54,14 @@ class MainWindow(QMainWindow):
     hbox.setContentsMargins(5, 5, 5, 5)
     hbox.addWidget(self.createImageGroup('Image A', self.imageLabelA, 'Image seed for class A'))
     hbox.addWidget(self.createImageGroup('Image B', self.imageLabelB, 'Image seed for class B'))
-    hbox.addWidget(self.createImageGroup('Image C', self.imageLabelC, 'Image that requires class identification'))
+    hbox.addWidget(self.createImageGroup('Image C', self.imageLabelC, 'Image that requires class identification', self.imageCaptionC))
     centralWidget.setLayout(hbox)
     self.setCentralWidget(centralWidget)
 
   ###
   # Components
   ###
-  def createImageGroup(self, title, imageLabel, caption):
+  def createImageGroup(self, title, imageLabel, caption, captionLabel=None):
     aGroup = QGroupBox(title)
 
     imageLabel.setBackgroundRole(QPalette.Dark)
@@ -73,8 +74,8 @@ class MainWindow(QMainWindow):
     centeringLayout.addWidget(imageLabel)
     centeringWidget.setLayout(centeringLayout)
 
-
-    captionLabel = QLabel(caption)
+    if not captionLabel: captionLabel = QLabel()
+    captionLabel.setText(caption)
     captionLabel.setAlignment(Qt.AlignCenter)
     captionLabel.setStyleSheet('QLabel { color: #888888; font-size: 10px; }')
 
@@ -88,7 +89,7 @@ class MainWindow(QMainWindow):
   # Actions
   ###
   def openImage(self, imageType):
-    filePath, _ = QFileDialog.getOpenFileName(self, 'Open Image', '', 'Image Files (*.png *.jpeg *.jpg)')
+    filePath, _ = QFileDialog.getOpenFileName(self, 'Open Image', './images', 'Image Files (*.png *.jpeg *.jpg)')
 
     image, imageLabel = {
       ImageType.A: (self.imageA, self.imageLabelA),
@@ -97,11 +98,20 @@ class MainWindow(QMainWindow):
       }[imageType]
 
     image = QImage(filePath)
-    self.classifier.setImage(imageType, image)
+
 
     pixmap = QPixmap.fromImage(image).scaled(IMAGE_LABEL_SIZE, IMAGE_LABEL_SIZE, \
              Qt.IgnoreAspectRatio, Qt.FastTransformation)
     imageLabel.setPixmap(pixmap)
+
+    if imageType == ImageType.C:
+      imageClass = self.classifier.getImageClass(image)
+      if imageClass == ImageType.A:
+        self.imageCaptionC.setText('Image is in class A')
+      elif imageClass == ImageType.B:
+        self.imageCaptionC.setText('Image is in class B')
+      else:
+        self.imageCaptionC.setText('Cannot recognize a class...')
 
   def createActions(self):
     self.openImageAAct = QAction('&Open image A', self, shortcut=QKeySequence.SelectAll, \
