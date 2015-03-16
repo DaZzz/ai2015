@@ -26,6 +26,10 @@ class MainWindow(QMainWindow):
     self.imageC = None
     self.classifier = Classifier()
 
+    self.classifier.setImage(ImageType.A, QImage('./images/a.png'))
+    self.classifier.setImage(ImageType.B, QImage('./images/b.png'))
+    self.classifier.isLinearlySeparable()
+
     self.imageLabelA = QLabel()
     self.imageLabelB = QLabel()
     self.imageLabelC = QLabel()
@@ -100,8 +104,10 @@ class MainWindow(QMainWindow):
     imageLabel.setPixmap(pixmap)
 
   def createActions(self):
-    self.openImageAAct = QAction('&Open image A', self, triggered=lambda: self.openImage(ImageType.A))
-    self.openImageBAct = QAction('&Open image B', self, triggered=lambda: self.openImage(ImageType.B))
+    self.openImageAAct = QAction('&Open image A', self, shortcut=QKeySequence.SelectAll, \
+                                triggered=lambda: self.openImage(ImageType.A))
+    self.openImageBAct = QAction('&Open image B', self, shortcut=QKeySequence.Bold, \
+                                triggered=lambda: self.openImage(ImageType.B))
     self.openImageCAct = QAction('&Open for classification', self, shortcut=QKeySequence.Open, \
                                 triggered=lambda: self.openImage(ImageType.C))
 
