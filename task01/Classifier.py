@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from ImageType import ImageType
 from copy import deepcopy
+from math import sqrt
 
 class Classifier(object):
 
@@ -60,7 +61,73 @@ class Classifier(object):
     return resultSet
 
   ###
-  # Check if linearly separable
+  # Algorithm of Konets
+  ###
+  def algorithmOfKozinets(self):
+    if (not self.setA) or (not self.setB): return None
+
+    # Fill set C
+    setC = []
+    for a in self.setA:
+      for b in self.setB:
+        c = [a0 - b0 for a0, b0 in zip(a, b)]
+        setC.append(c)
+
+    # Find cT and minVal
+    cT  = deepcopy(setC[0])
+    minVal = sum(a*b for a,b in zip(setC[0], setC[0]))
+    for c in setC[1:]:
+      newVal = sum(a*b for a,b in zip(c, c))
+      if newVal < minVal:
+        cT = deepcopy(c)
+        minVal = newVal
+
+    # Find cT
+    eps = 0.00000001
+    MAX_ITERATION_COUNT = 50
+    for t in range(MAX_ITERATION_COUNT):
+      cT1  = cT
+      rMax = 0
+      for c in setC:
+
+        # Calculate h (lambda)
+        diff  = [x - y for x, y in zip(cT, c)]
+        prod1 = sum(x * y for x, y in zip(c, diff))
+        prod2 = sum(x * y for x, y in zip(diff, diff))
+        h = 0
+        if prod2 != 0:
+          h = -(prod1/prod2)
+          h = min(max(0, h), 1)
+
+        # Calculate rMax
+        v1    = map(lambda x: x*h, cT)
+        v2    = map(lambda x: x*(1-h), c)
+        cTT   = [x+y for x,y in zip(v1,v2)]
+        rVec  = [x-y for x,y in zip(cTT, cT)]
+        r     = sqrt(sum(x*y for x,y in zip(rVec, rVec)))
+        if r > rMax:
+          cT1 = cTT
+          rMax= r
+
+      if rMax < eps:
+        break
+      else:
+        cT = cT1
+
+    # Calculate tetta
+    tettaMin = sum(x*y for x,y in zip(cT, self.setA[0]))
+    tettaMax = sum(x*y for x,y in zip(cT, self.setB[0]))
+    for i in range(1, len(self.setA)):
+      tettaMin = min(tettaMin, sum(x*y for x,y in zip(cT, self.setA[i])))
+      tettaMax = max(tettaMax, sum(x*y for x,y in zip(cT, self.setB[i])))
+
+    # Calculate a
+    a = deepcopy(cT)
+    a.append((tettaMin + tettaMax)/2)
+    return a
+
+  ###
+  # Standard linear separation algorithm
   ###
   def linearSeparation(self):
     if (not self.setA) or (not self.setB): return None
@@ -110,8 +177,14 @@ class Classifier(object):
   ###
   # Get image class
   ###
-  def getImageClass(self, image):
-    l = self.linearSeparation()
+  def getImageClass(self, image, useKozinetsAlgorithm=False):
+    l = None
+
+    if useKozinetsAlgorithm:
+      l = self.algorithmOfKozinets()
+    else:
+      l = self.linearSeparation()
+
     if not l: return None
 
     w, h = image.width(), image.height()

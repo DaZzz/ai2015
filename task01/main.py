@@ -28,7 +28,6 @@ class MainWindow(QMainWindow):
 
     self.classifier.setImage(ImageType.A, QImage('./images/a.png'))
     self.classifier.setImage(ImageType.B, QImage('./images/b.png'))
-    self.classifier.isLinearlySeparable()
 
     self.imageLabelA = QLabel()
     self.imageLabelB = QLabel()
@@ -105,7 +104,7 @@ class MainWindow(QMainWindow):
     imageLabel.setPixmap(pixmap)
 
     if imageType == ImageType.C:
-      imageClass = self.classifier.getImageClass(image)
+      imageClass = self.classifier.getImageClass(image, useKozinetsAlgorithm=True)
       if imageClass == ImageType.A:
         self.imageCaptionC.setText('Image is in class A')
       elif imageClass == ImageType.B:
