@@ -1,2 +1,3 @@
 $(document).ready ->
-  require 'main'
+  # require 'kmeans-test'
+  require 'canvas-test'
