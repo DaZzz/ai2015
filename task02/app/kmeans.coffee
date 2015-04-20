@@ -22,7 +22,11 @@ closestCentroid = (point, centroids, distance)  ->
   index
 
 
-# Random cetroids for init
+# Random k points from points
+randomPointCentroids = (points, k) ->
+  _.take(_.shuffle(points), k)
+
+# Random points centroids
 randomCentroids = (points, k) ->
   zipped       = _.unzip(points)
   zippedRandom = _.map zipped , (xs) ->
@@ -36,9 +40,6 @@ randomCentroids = (points, k) ->
 
   _.unzip(zippedRandom)
 
-
-
-
 ###
 # Implementation of k-means algorithm
 #   bounds: [[Double, Double]]
@@ -49,10 +50,12 @@ randomCentroids = (points, k) ->
 ###
 kmeans = (points, k) ->
 
-  centroidsArray = randomCentroids(points, k).slice(0)
-  assignments = new Array(points.length)
-  clusters = new Array(k)
-  distance    = ((v1, v2) -> eulerDistance(v1, v2))
+  centroidsArray = randomPointCentroids(points, k).slice(0)
+  assignments    = new Array(points.length)
+  clusters       = new Array(k)
+  distance       = ((v1, v2) -> eulerDistance(v1, v2))
+
+  console.log centroidsArray.toString()
 
   hasMovement = true
   while hasMovement

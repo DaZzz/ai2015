@@ -49,7 +49,7 @@ generateImages = (image) ->
   [addWhiteNoise, addBlackNoise] = ['white', 'black'].map (color) -> _.curryRight(addNoise)(2)(color)
 
   # _.chain combinations([-2..2], [-3..3])
-  _.chain combinations([0,0,0,0], [0,0,0])
+  _.chain combinations([0,0,0,0,0], [0,0,0,0,0])
     .map (shift) ->
       [i, j] = shift
       context = createContext(image)
@@ -85,7 +85,12 @@ vectorize = (context) ->
 ###
 window.includes = (xss, xs) -> _.any(xss, (ys) -> _.isEqual(ys, xs))
 
+
+###
+# Main function
+###
 window.onload = ->
+
   pairs = _.chain 'a b'.split(' ')
     .map (name) -> createImage("#{name}.png")
     .map generateImages
@@ -107,13 +112,4 @@ window.onload = ->
       context = pair[0]
       {width, height} = context.canvas
       createContext(context).drawImage(context.canvas, 0, 0, width, height)
-
-
-
-  # generateImages(imgA)
-  # for i in [1..10]
-  #   canvas = $('<canvas/>').attr(width: 200, height: 200).appendTo('body').get(0)
-  #   context = canvas.getContext('2d')
-  #   context.imageSmoothingEnabled = false
-  #   context.drawImage(imgA, 0, 0, 200, 200)
 
