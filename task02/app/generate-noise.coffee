@@ -150,7 +150,7 @@ redrawImages = (data, k) ->
 window.onload = ->
 
 
-  contextVectorPairs = _.chain 'a b'.split(' ')
+  contextVectorPairs = _.chain 'a b z'.split(' ')
     .map (name) -> createImage("#{name}.png")
     .map generateImages
     .flatten()
@@ -169,14 +169,14 @@ window.onload = ->
 
     if isShuffled
       vectors  = _.unzip(data)[5]
-      clusters = kmeans(vectors, 2)
+      clusters = kmeans(vectors, 3)
 
       clusterizedData = data.map (d) ->
         c = _.findIndex(clusters, (c) -> includes(c, d[5]) )
         ci = _.findIndex(clusters[c], (vector) -> _.isEqual(d[5], vector))
         d[2] = ci
         d[3] = c
-        d[4] = 2
+        d[4] = 3
         d
 
       redrawImages(clusterizedData)
@@ -186,15 +186,3 @@ window.onload = ->
       dataShuffle = _.map(data, (d, i) -> d[2] = inds[i]; d[3] = 0; d[4] = 1; d)
       redrawImages(dataShuffle)
       isShuffled = true
-
-
-
-
-
-
-
-
-
-
-
-
