@@ -55,7 +55,7 @@ generateImages = (image) ->
 
   # _.chain combinations([-2..2], [-3..3])
   # _.chain combinations([0,0,0,0,0,0], [0,0,0,0,0])
-  _.chain [1..72].map -> [0, 0]
+  _.chain [1..64].map -> [0, 0]
     .map (shift) ->
       [i, j] = shift
       context = createContext(image)
