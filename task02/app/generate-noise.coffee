@@ -129,9 +129,6 @@ redrawImages = (data, k) ->
       colsInCluster = Math.round(cols / cn)
       clusterWidth = colsInCluster * width + padding * (colsInCluster - 1)
       offset = (ic % colsInCluster) * width + (ic % colsInCluster) * padding
-
-      console.log colsInCluster, clusterWidth, offset, c
-
       clusterWidth * c + clusterMargin * c + offset + 'px'
     )
 
@@ -170,14 +167,28 @@ window.onload = ->
     if isShuffled
       vectors  = _.unzip(data)[5]
       clusters = kmeans(vectors, 3)
+      clusters = clusters.map (cluster) -> _.zip(cluster, (cluster.map -> true))
 
+      ###
+      # Prepare data for drawing
+      ###
       clusterizedData = data.map (d) ->
-        c = _.findIndex(clusters, (c) -> includes(c, d[5]) )
-        ci = _.findIndex(clusters[c], (vector) -> _.isEqual(d[5], vector))
-        d[2] = ci
-        d[3] = c
-        d[4] = 3
-        d
+
+        c = _.findIndex(clusters, (c) ->
+
+          _.findIndex(c, (vectorBoolPair) -> _.isEqual(vectorBoolPair[0], d[5])) != -1
+        )
+
+        cluster = clusters[c]
+
+        ci = _.findIndex cluster, (vectorBoolPair) ->
+            if _.isEqual(d[5], vectorBoolPair[0]) and vectorBoolPair[1]
+              vectorBoolPair[1] = false
+              true
+            else
+              false
+
+        d = [d[0], d[1], ci, c, 3, d[5]]
 
       redrawImages(clusterizedData)
       isShuffled = false

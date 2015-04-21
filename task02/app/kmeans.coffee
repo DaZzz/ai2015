@@ -55,8 +55,6 @@ kmeans = (points, k) ->
   clusters       = new Array(k)
   distance       = ((v1, v2) -> eulerDistance(v1, v2))
 
-  console.log centroidsArray.toString()
-
   hasMovement = true
   while hasMovement
 
