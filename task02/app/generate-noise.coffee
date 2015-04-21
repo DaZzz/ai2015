@@ -159,7 +159,7 @@ window.onload = ->
 
   data = contextVectorPairs.map (pair, i) ->
     [context, vector] = pair
-    [context, i, i, 1, 1]
+    [context, i, i, 1, 1, vector]
 
   redrawImages(data, 1)
 
