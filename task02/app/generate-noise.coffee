@@ -55,7 +55,7 @@ generateImages = (image) ->
 
   # _.chain combinations([-2..2], [-3..3])
   # _.chain combinations([0,0,0,0,0,0], [0,0,0,0,0])
-  _.chain [1..60].map -> [0, 0]
+  _.chain [1..72].map -> [0, 0]
     .map (shift) ->
       [i, j] = shift
       context = createContext(image)
@@ -93,18 +93,18 @@ window.includes = (xss, xs) -> _.any(xss, (ys) -> _.isEqual(ys, xs))
 
 ###
 # Handle drawing
-#   [context, index, index, cluster, clusterN]
-#
-#
-#
+#   data = [context, index, indexCluster, cluster, clusterN]
 ###
-redrawImages = (images) ->
-  cols = 15
+redrawImages = (data, k) ->
+
+
+  cols = 16
   padding = 10
+  clusterMargin = 100
   width = IMAGE_SIZE
   height = IMAGE_SIZE
 
-  paneWidth = width * cols + padding * (cols - 1)
+  paneWidth = width * cols + padding * (cols - 1) + clusterMargin * (k - 1)
 
   pane = d3.select('body').selectAll('div.pane').data([1])
 
@@ -113,20 +113,34 @@ redrawImages = (images) ->
     .style('position', 'relative')
     .style('width', paneWidth+'px')
 
-  cs = pane.selectAll('canvas').data(images)
+  cs = pane.selectAll('canvas').data(data, (d) -> d[1])
 
   cs.enter()
-    .append (d) -> d
+    .append (d) -> d[0].canvas
     .style('position', 'absolute')
     .style('opacity', '0')
-    .style('transform', 'translateY(0, 200)')
     .transition(300)
-    .delay((d, i) -> i*10)
+    # .delay((d, i) -> i*10)
     .style('opacity', 1)
 
   cs.transition()
-    .style('left', (d, i) -> (i % cols) * width + (i % cols) * padding + 'px')
-    .style('top', (d, i) -> Math.floor(i / cols) * height + Math.floor(i / cols) * padding + 'px')
+    .style('left', (d) ->
+      [ctx, i, ic, c, cn] = d
+      colsInCluster = Math.round(cols / cn)
+      clusterWidth = colsInCluster * width + padding * (colsInCluster - 1)
+      offset = (ic % colsInCluster) * width + (ic % colsInCluster) * padding
+
+      # console.log colsInCluster, clusterWidth, offset, c
+
+      clusterWidth * (c - 1) + clusterMargin * (c - 1) + offset + 'px'
+    )
+
+    .style('top', (d, i) ->
+      [ctx, i, ic, c, cn] = d
+      colsInCluster = Math.round(cols / cn)
+      clusterWidth = colsInCluster * width + padding * (colsInCluster - 1)
+      Math.floor(ic / colsInCluster) * height + Math.floor(ic / colsInCluster) * padding + 'px'
+    )
 
 
 
@@ -136,13 +150,32 @@ redrawImages = (images) ->
 window.onload = ->
 
 
-  pairs = _.chain 'a b'.split(' ')
+  contextVectorPairs = _.chain 'a b'.split(' ')
     .map (name) -> createImage("#{name}.png")
     .map generateImages
     .flatten()
     .map (context) -> [context, vectorize(context)]
     .value()
 
+  data = contextVectorPairs.map (pair, i) ->
+    [context, vector] = pair
+    [context, i, i, 1, 1]
 
-  redrawImages(pairs.map (pair) -> pair[0].canvas)
+  redrawImages(data, 1)
+
+  $('body').click ->
+    inds = _.shuffle(_.map(data, (d) -> d[2]))
+    dataShuffle = _.map(data, (d, i) -> d[2] = inds[i]; d)
+    redrawImages(dataShuffle)
+    # data
+
+
+
+
+
+
+
+
+
+
 
