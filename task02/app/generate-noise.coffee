@@ -111,7 +111,8 @@ redrawImages = (data, k) ->
   pane.enter().append('div')
     .attr('class', 'pane')
     .style('position', 'relative')
-    .style('width', paneWidth+'px')
+
+  pane.style('width', paneWidth+'px')
 
   cs = pane.selectAll('canvas').data(data, (d) -> d[1])
 
@@ -120,7 +121,6 @@ redrawImages = (data, k) ->
     .style('position', 'absolute')
     .style('opacity', '0')
     .transition(300)
-    # .delay((d, i) -> i*10)
     .style('opacity', 1)
 
   cs.transition()
@@ -130,9 +130,9 @@ redrawImages = (data, k) ->
       clusterWidth = colsInCluster * width + padding * (colsInCluster - 1)
       offset = (ic % colsInCluster) * width + (ic % colsInCluster) * padding
 
-      # console.log colsInCluster, clusterWidth, offset, c
+      console.log colsInCluster, clusterWidth, offset, c
 
-      clusterWidth * (c - 1) + clusterMargin * (c - 1) + offset + 'px'
+      clusterWidth * c + clusterMargin * c + offset + 'px'
     )
 
     .style('top', (d, i) ->
@@ -159,15 +159,34 @@ window.onload = ->
 
   data = contextVectorPairs.map (pair, i) ->
     [context, vector] = pair
-    [context, i, i, 1, 1, vector]
+    [context, i, i, 0, 1, vector]
 
   redrawImages(data, 1)
 
+
+  isShuffled = true
   $('body').click ->
-    inds = _.shuffle(_.map(data, (d) -> d[2]))
-    dataShuffle = _.map(data, (d, i) -> d[2] = inds[i]; d)
-    redrawImages(dataShuffle)
-    # data
+
+    if isShuffled
+      vectors  = _.unzip(data)[5]
+      clusters = kmeans(vectors, 2)
+
+      clusterizedData = data.map (d) ->
+        c = _.findIndex(clusters, (c) -> includes(c, d[5]) )
+        ci = _.findIndex(clusters[c], (vector) -> _.isEqual(d[5], vector))
+        d[2] = ci
+        d[3] = c
+        d[4] = 2
+        d
+
+      redrawImages(clusterizedData)
+      isShuffled = false
+    else
+      inds = _.shuffle(_.map(data, (d) -> d[1]))
+      dataShuffle = _.map(data, (d, i) -> d[2] = inds[i]; d[3] = 0; d[4] = 1; d)
+      redrawImages(dataShuffle)
+      isShuffled = true
+
 
 
 
