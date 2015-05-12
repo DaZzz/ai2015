@@ -1,0 +1,23 @@
+{
+  "name": "brunch-for-homeless",
+  "version": "0.0.0",
+  "authors": [
+    "molefrog <molefrog@gmail.com>"
+  ],
+  "description": "Brunch skeleton for homeless guys",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-grid-css": "*",
+    "d3": "~3.5.5",
+    "jquery": "~2.1.3",
+    "lodash": "~3.7.0"
+  }
+}

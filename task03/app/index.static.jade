@@ -1,0 +1,23 @@
+doctype html
+head
+  meta(name="viewport" content="width=device-width")
+
+  link(rel="stylesheet" href="stylesheets/app.css")
+
+  script(src="javascripts/vendor.js")
+  script(src="javascripts/app.js")
+
+  script.
+    require('initialize');
+
+body
+  //- Ресурсы
+  for i in [0,1,2,3,4,5,6,7,8,9]
+    img(src=(i+".png") style='display: none;')
+
+  .original-images
+
+  .history
+
+  //- img.b(src="b.png" style='display: none;')
+  //- img.z(src="z.png" style='display: none;')
